@@ -8,12 +8,16 @@ object GameDef {
   implicit def pos2List(pos: Pos): List[Int] = List(pos.letter, pos.number)
 
   case class Pos(letter: Int, number: Int) {
+    lazy val onBoard = (A to H).contains(letter) && (1 to 8).contains(number)
+
     def +(direction: Direction): Pos = {
       val newMove = this.zip(direction).map {
         case (a, b) => a + b
       }
       Pos(newMove.head, newMove.tail.head)
     }
+
+    override def toString = "Pos(" + ('A' + letter - 1).asInstanceOf[Char] + ", " + number + ")"
   }
 
   object Color extends Enumeration {
@@ -30,6 +34,9 @@ object GameDef {
   val F = 6
   val G = 7
   val H = 8
+
+  def baseNumber(color: Color.Value): Int = if (color == white) 1 else 8
+  def baseNextNumber(color: Color.Value): Int = if (color == white) 2 else 7
 
   type GameBoard = Map[Pos, Piece]
 
@@ -87,12 +94,30 @@ object GameDef {
 
     protected def validPos(pos: Pos, gameBoard: GameBoard): Boolean =
       (!gameBoard.contains(pos) || gameBoard(pos).color != color) &&
-        (A to H).contains(pos.letter) && (1 to 8).contains(pos.number)
+        pos.onBoard
   }
 
   case class King(color: Color.Value) extends Piece {
     val infinity = false
     val directions = verticalDirections ::: horizontalDirections ::: diagonalDirections
+
+    def castlingMoves(pos: Pos, gameBoard: GameBoard): List[Pos] = {
+      def isRookOfSameColor(piece: Option[Piece]): Boolean = piece match {
+        case Some(Rook(c)) if c == color => true
+        case _ => false
+      }
+      (if (isRookOfSameColor(gameBoard.get((H, baseNumber(color)))) &&
+        !gameBoard.contains((F, baseNumber(color))) &&
+        !gameBoard.contains((G, baseNumber(color)))) List(Pos(G, baseNumber(color)))
+      else Nil) ++
+        (if (isRookOfSameColor(gameBoard.get((A, baseNumber(color)))) &&
+          (B to D).foldLeft(true)((prev: Boolean, letter: Int) => prev && !gameBoard.contains((letter, baseNumber(color)))))
+          List(Pos(C, baseNumber(color)))
+        else Nil)
+    }
+
+    override def moves(pos: Pos, gameBoard: GameBoard) = super.moves(pos, gameBoard) ++
+      castlingMoves(pos, gameBoard)
   }
 
   case class Queen(color: Color.Value) extends Piece {
@@ -120,7 +145,7 @@ object GameDef {
     val direction = if (color == white) whitePawnsDirection else blackPawnsDirection
     val directions = List(direction)
 
-    private def isStartPosition(pos: Pos): Boolean = if (color == Color.white) pos.number == 2 else pos.number == 7
+    private def isStartPosition(pos: Pos): Boolean = pos.number == baseNextNumber(color)
 
     override def moves(pos: Pos, gameBoard: GameBoard) = {
       def fightMove(pos: Pos, direction: Direction) = {
@@ -133,7 +158,8 @@ object GameDef {
         else fightMove(pos, SouthEast) ++ fightMove(pos, SouthWest)
 
       val friendlyMoves = super.moves(pos, gameBoard) ++ (if (isStartPosition(pos))
-        super.moves(pos + direction, gameBoard) else Nil)
+        super.moves(pos + direction, gameBoard)
+      else Nil)
 
       friendlyMoves ++ fightingMoves
     }
