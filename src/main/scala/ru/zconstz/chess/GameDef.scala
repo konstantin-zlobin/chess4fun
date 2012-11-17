@@ -132,9 +132,8 @@ object GameDef {
         if (color == Color.white) fightMove(pos, NorthEast) ++ fightMove(pos, NorthWest)
         else fightMove(pos, SouthEast) ++ fightMove(pos, SouthWest)
 
-      val friendlyMoves = if (isStartPosition(pos))
-        super.moves(pos, gameBoard) ++ super.moves(pos + direction, gameBoard)
-      else super.moves(pos, gameBoard)
+      val friendlyMoves = super.moves(pos, gameBoard) ++ (if (isStartPosition(pos))
+        super.moves(pos + direction, gameBoard) else Nil)
 
       friendlyMoves ++ fightingMoves
     }
