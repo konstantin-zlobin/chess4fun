@@ -149,9 +149,51 @@ class PieceMovementsSuite extends FunSuite {
     assert(validFor(Color.black))
   }
 
-  test("Rook's moves including the Castling") {
-    //TODO: implement
+  test("Rook's moves: left rook with king") {
+    def validFor(color: Color.Value): Option[String] = {
+      val bn = baseNumber(color)
+      Rook(color).moves((A, bn), Map(Pos(A, bn) -> Rook(color), Pos(E, bn) -> King(color))).toSet ===
+        Set[Pos](
+          (A, 2), (A, 3), (A, 4), (A, 5), (A, 6), (A, 7), (A, baseNumber(Color.opposite(color))),
+          (B, bn), (C, bn), (D, bn)
+        )
+    }
+    assert(validFor(Color.white))
+    assert(validFor(Color.black))
+  }
+  test("Rook's moves: right rook with king") {
+    def validFor(color: Color.Value): Option[String] = {
+      val bn = baseNumber(color)
+      Rook(color).moves((H, bn), Map(Pos(H, bn) -> Rook(color), Pos(E, bn) -> King(color))).toSet ===
+        Set[Pos](
+          (H, 2), (H, 3), (H, 4), (H, 5), (H, 6), (H, 7), (H, baseNumber(Color.opposite(color))),
+          (F, bn), (G, bn)
+        )
+    }
+    assert(validFor(Color.white))
+    assert(validFor(Color.black))
+  }
+  test("Rook's moves: rook in the center") {
+    def validFor(color: Color.Value): Option[String] = {
+      Rook(color).moves((E, 4), Map(Pos(E, 4) -> Rook(color))).toSet ===
+        Set[Pos](
+          (E, 1), (E, 2), (E, 3), (E, 5), (E, 6), (E, 7), (E, 8),
+          (A, 4), (B, 4), (C, 4), (D, 4), (F, 4), (G, 4), (H, 4)
+        )
+    }
+    assert(validFor(Color.white))
+    assert(validFor(Color.black))
   }
 
-
+  test("Bishop's moves") {
+    def validFor(color: Color.Value): Option[String] = {
+      Bishop(color).moves((E, 4), Map(Pos(E, 4) -> Bishop(color))).toSet ===
+        Set[Pos](
+          (F, 5), (G, 6), (H, 7), (A, 8), (B, 7), (C, 6), (D, 5),
+          (F, 3), (G, 2), (H, 1), (B, 1), (C, 2), (D, 3)
+        )
+    }
+    assert(validFor(Color.white))
+    assert(validFor(Color.black))
+  }
 }

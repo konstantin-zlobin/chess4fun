@@ -22,6 +22,7 @@ object GameDef {
 
   object Color extends Enumeration {
     val white, black = Value
+    def opposite(color:Color.Value) = if (color == white) black else white
   }
 
   import Color._
