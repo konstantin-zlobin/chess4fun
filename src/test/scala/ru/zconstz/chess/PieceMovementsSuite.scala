@@ -196,4 +196,20 @@ class PieceMovementsSuite extends FunSuite {
     assert(validFor(Color.white))
     assert(validFor(Color.black))
   }
+
+  test("Knight") {
+    def validFor(color: Color.Value): Option[String] = {
+      Knight(color).moves((E, 4), Map(Pos(E, 4) -> Knight(color))).toSet ===
+        Set[Pos](
+          (E + 1, 4 + 2), (E + 2, 4 + 1), (E - 1, 4 + 2), (E - 2, 4 + 1),
+          (E + 1, 4 - 2), (E + 2, 4 - 1), (E - 1, 4 - 2), (E - 2, 4 - 1)
+        )
+    }
+    assert(validFor(Color.white))
+    assert(validFor(Color.black))
+  }
+
+  test("Pawn") {
+    //TODO:
+  }
 }
