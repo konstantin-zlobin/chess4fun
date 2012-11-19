@@ -201,15 +201,29 @@ class PieceMovementsSuite extends FunSuite {
     def validFor(color: Color.Value): Option[String] = {
       Knight(color).moves((E, 4), Map(Pos(E, 4) -> Knight(color))).toSet ===
         Set[Pos](
-          (E + 1, 4 + 2), (E + 2, 4 + 1), (E - 1, 4 + 2), (E - 2, 4 + 1),
-          (E + 1, 4 - 2), (E + 2, 4 - 1), (E - 1, 4 - 2), (E - 2, 4 - 1)
+          (F, 6), (G, 5), (D, 6), (C, 5),
+          (F, 2), (G, 3), (D, 2), (C, 3)
         )
     }
     assert(validFor(Color.white))
     assert(validFor(Color.black))
   }
 
-  test("Pawn") {
-    //TODO:
+  test("White pawn at starting position") {
+    Pawn(Color.white).moves((E, 2),
+      Map(Pos(E, 2) -> Pawn(Color.white), Pos(D, 3) -> Knight(Color.black),
+        Pos(F, 3) -> Knight(Color.black))).toSet ===
+      Set[Pos](
+        (E, 3), (E, 4), (D, 3), (F, 3)
+      )
+  }
+
+  test("Black pawn at starting position") {
+    Pawn(Color.black).moves((E, 7),
+      Map(Pos(E, 7) -> Pawn(Color.black), Pos(D, 6) -> Knight(Color.white),
+        Pos(F, 6) -> Knight(Color.white))).toSet ===
+      Set[Pos](
+        (E, 5), (E, 6), (D, 5), (F, 5)
+      )
   }
 }

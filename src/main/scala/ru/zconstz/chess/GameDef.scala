@@ -5,10 +5,10 @@ object GameDef {
 
   implicit def tuple2Pos(tuple: (Int, Int)): Pos = new Pos(tuple._1, tuple._2)
 
-  implicit def pos2List(pos: Pos): List[Int] = List(pos.letter, pos.number)
-
   case class Pos(letter: Int, number: Int) {
     lazy val onBoard = (A to H).contains(letter) && (1 to 8).contains(number)
+
+    implicit def pos2List(pos: Pos): List[Int] = List(pos.letter, pos.number)
 
     def +(direction: Direction): Pos = {
       val newMove = this.zip(direction).map {
@@ -22,7 +22,8 @@ object GameDef {
 
   object Color extends Enumeration {
     val white, black = Value
-    def opposite(color:Color.Value) = if (color == white) black else white
+
+    def opposite(color: Color.Value) = if (color == white) black else white
   }
 
   import Color._
