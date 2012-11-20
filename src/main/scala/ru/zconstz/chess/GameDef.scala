@@ -3,6 +3,23 @@ package ru.zconstz.chess
 
 object GameDef {
 
+  val A = 1
+  val B = 2
+  val C = 3
+  val D = 4
+  val E = 5
+  val F = 6
+  val G = 7
+  val H = 8
+
+  object Color extends Enumeration {
+    val white, black = Value
+
+    def opposite(color: Color.Value) = if (color == white) black else white
+  }
+
+  import Color._
+
   implicit def tuple2Pos(tuple: (Int, Int)): Pos = new Pos(tuple._1, tuple._2)
 
   case class Pos(letter: Int, number: Int) {
@@ -19,23 +36,6 @@ object GameDef {
 
     override def toString = "Pos(" + ('A' + letter - 1).asInstanceOf[Char] + ", " + number + ")"
   }
-
-  object Color extends Enumeration {
-    val white, black = Value
-
-    def opposite(color: Color.Value) = if (color == white) black else white
-  }
-
-  import Color._
-
-  val A = 1
-  val B = 2
-  val C = 3
-  val D = 4
-  val E = 5
-  val F = 6
-  val G = 7
-  val H = 8
 
   def baseNumber(color: Color.Value): Int = if (color == white) 1 else 8
   def baseNextNumber(color: Color.Value): Int = if (color == white) 2 else 7
@@ -180,6 +180,5 @@ object GameDef {
     )
 
   case class Move(from: GameBoard, to: GameBoard)
-
 }
 

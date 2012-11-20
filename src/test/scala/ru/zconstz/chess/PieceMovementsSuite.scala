@@ -197,13 +197,10 @@ class PieceMovementsSuite extends FunSuite {
     assert(validFor(Color.black))
   }
 
-  test("Knight") {
+  test("Knight's moves") {
     def validFor(color: Color.Value): Option[String] = {
       Knight(color).moves((E, 4), Map(Pos(E, 4) -> Knight(color))).toSet ===
-        Set[Pos](
-          (F, 6), (G, 5), (D, 6), (C, 5),
-          (F, 2), (G, 3), (D, 2), (C, 3)
-        )
+        Set[Pos]((F, 6), (G, 5), (D, 6), (C, 5), (F, 2), (G, 3), (D, 2), (C, 3))
     }
     assert(validFor(Color.white))
     assert(validFor(Color.black))
@@ -212,18 +209,33 @@ class PieceMovementsSuite extends FunSuite {
   test("White pawn at starting position") {
     Pawn(Color.white).moves((E, 2),
       Map(Pos(E, 2) -> Pawn(Color.white), Pos(D, 3) -> Knight(Color.black),
-        Pos(F, 3) -> Knight(Color.black))).toSet ===
-      Set[Pos](
-        (E, 3), (E, 4), (D, 3), (F, 3)
-      )
+        Pos(F, 3) -> Knight(Color.black))).toSet === Set[Pos]((E, 3), (E, 4), (D, 3), (F, 3))
+  }
+
+  test("White pawn not in starting position") {
+    Pawn(Color.white).moves((E, 3),
+      Map(Pos(E, 3) -> Pawn(Color.white), Pos(D, 4) -> Knight(Color.black),
+        Pos(F, 4) -> Knight(Color.black))).toSet === Set[Pos]((E, 4), (D, 4), (F, 4))
+  }
+
+  test("White pawn not in starting position with no enemies around") {
+    Pawn(Color.white).moves((E, 5), Map(Pos(E, 3) -> Pawn(Color.white))).toSet === Set[Pos]((E, 6))
   }
 
   test("Black pawn at starting position") {
-    Pawn(Color.black).moves((E, 7),
+    assert(Pawn(Color.black).moves((E, 7),
       Map(Pos(E, 7) -> Pawn(Color.black), Pos(D, 6) -> Knight(Color.white),
-        Pos(F, 6) -> Knight(Color.white))).toSet ===
-      Set[Pos](
-        (E, 5), (E, 6), (D, 5), (F, 5)
-      )
+        Pos(F, 6) -> Knight(Color.white))).toSet === Set[Pos]((E, 6), (E, 5), (D, 6), (F, 6))
+    )
+  }
+
+  test("Black pawn not in starting position") {
+    Pawn(Color.black).moves((E, 6),
+      Map(Pos(E, 6) -> Pawn(Color.black), Pos(D, 7) -> Knight(Color.white),
+        Pos(F, 7) -> Knight(Color.white))).toSet === Set[Pos]((E, 7), (D, 7), (F, 7))
+  }
+
+  test("Black pawn not in starting position with no enemies around") {
+    Pawn(Color.black).moves((E, 4), Map(Pos(E, 4) -> Pawn(Color.white))).toSet === Set[Pos]((E, 3))
   }
 }
