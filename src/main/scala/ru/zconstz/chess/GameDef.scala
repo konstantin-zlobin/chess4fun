@@ -20,27 +20,27 @@ object GameDef {
 
   import Color._
 
-  implicit def tuple2Pos(tuple: (Int, Int)): Pos = new Pos(tuple._1, tuple._2)
+  implicit def tuple2Pos(tuple: (Int, Int)): Place = new Place(tuple._1, tuple._2)
 
-  case class Pos(letter: Int, number: Int) {
+  case class Place(letter: Int, number: Int) {
     lazy val onBoard = (A to H).contains(letter) && (1 to 8).contains(number)
 
-    implicit def pos2List(pos: Pos): List[Int] = List(pos.letter, pos.number)
+    implicit def pos2List(pos: Place): List[Int] = List(pos.letter, pos.number)
 
-    def +(direction: Direction): Pos = {
+    def +(direction: Direction): Place = {
       val newMove = this.zip(direction).map {
         case (a, b) => a + b
       }
-      Pos(newMove.head, newMove.tail.head)
+      Place(newMove.head, newMove.tail.head)
     }
 
-    override def toString = "Pos(" + ('A' + letter - 1).asInstanceOf[Char] + ", " + number + ")"
+    override def toString = "Place(" + ('A' + letter - 1).asInstanceOf[Char] + ", " + number + ")"
   }
 
   def baseNumber(color: Color.Value): Int = if (color == white) 1 else 8
   def baseNextNumber(color: Color.Value): Int = if (color == white) 2 else 7
 
-  type GameBoard = Map[Pos, Piece]
+  type GameBoard = Map[Place, Piece]
 
   sealed case class Direction(deltaLetter: Int, deltaNumber: Int) {
     val unitDelta = (deltaLetter, deltaNumber)
@@ -83,9 +83,9 @@ object GameDef {
 
     def directions: List[Direction]
 
-    def moves(pos: Pos, gameBoard: GameBoard): List[Pos] = movesAux(pos, gameBoard, directions)
+    def moves(pos: Place, gameBoard: GameBoard): List[Place] = movesAux(pos, gameBoard, directions)
 
-    protected def movesAux(pos: Pos, gameBoard: GameBoard, directions: List[Direction]): List[Pos] = {
+    protected def movesAux(pos: Place, gameBoard: GameBoard, directions: List[Direction]): List[Place] = {
       val more = for {
         deltaMove <- directions
         newPosition = pos + deltaMove
@@ -94,7 +94,7 @@ object GameDef {
       more.flatten
     }
 
-    protected def validPos(pos: Pos, gameBoard: GameBoard): Boolean =
+    protected def validPos(pos: Place, gameBoard: GameBoard): Boolean =
       (!gameBoard.contains(pos) || gameBoard(pos).color != color) &&
         pos.onBoard
   }
@@ -103,22 +103,22 @@ object GameDef {
     val infinity = false
     val directions = verticalDirections ::: horizontalDirections ::: diagonalDirections
 
-    def castlingMoves(pos: Pos, gameBoard: GameBoard): List[Pos] = {
+    def castlingMoves(pos: Place, gameBoard: GameBoard): List[Place] = {
       def isRookOfSameColor(piece: Option[Piece]): Boolean = piece match {
         case Some(Rook(c)) if c == color => true
         case _ => false
       }
       (if (isRookOfSameColor(gameBoard.get((H, baseNumber(color)))) &&
         !gameBoard.contains((F, baseNumber(color))) &&
-        !gameBoard.contains((G, baseNumber(color)))) List(Pos(G, baseNumber(color)))
+        !gameBoard.contains((G, baseNumber(color)))) List(Place(G, baseNumber(color)))
       else Nil) ++
         (if (isRookOfSameColor(gameBoard.get((A, baseNumber(color)))) &&
           (B to D).foldLeft(true)((prev: Boolean, letter: Int) => prev && !gameBoard.contains((letter, baseNumber(color)))))
-          List(Pos(C, baseNumber(color)))
+          List(Place(C, baseNumber(color)))
         else Nil)
     }
 
-    override def moves(pos: Pos, gameBoard: GameBoard) = super.moves(pos, gameBoard) ++
+    override def moves(pos: Place, gameBoard: GameBoard) = super.moves(pos, gameBoard) ++
       castlingMoves(pos, gameBoard)
   }
 
@@ -147,10 +147,10 @@ object GameDef {
     val direction = if (color == white) whitePawnsDirection else blackPawnsDirection
     val directions = List(direction)
 
-    private def isStartPosition(pos: Pos): Boolean = pos.number == baseNextNumber(color)
+    private def isStartPosition(pos: Place): Boolean = pos.number == baseNextNumber(color)
 
-    override def moves(pos: Pos, gameBoard: GameBoard) = {
-      def fightMove(pos: Pos, direction: Direction) = {
+    override def moves(pos: Place, gameBoard: GameBoard) = {
+      def fightMove(pos: Place, direction: Direction) = {
         val newPos = pos + direction
         if (gameBoard.contains(newPos) && validPos(newPos, gameBoard)) List(newPos) else Nil
       }
@@ -169,16 +169,14 @@ object GameDef {
 
   val initialState: GameBoard =
     Map(
-      Pos(A, 1) -> Rook(white), Pos(B, 1) -> Knight(white), Pos(C, 1) -> Bishop(white), Pos(D, 1) -> Queen(white),
-      Pos(E, 1) -> King(white), Pos(F, 1) -> Bishop(white), Pos(G, 1) -> Knight(white), Pos(H, 1) -> Rook(white),
-      Pos(A, 2) -> Pawn(white), Pos(B, 2) -> Pawn(white), Pos(C, 2) -> Pawn(white), Pos(D, 2) -> Pawn(white),
-      Pos(E, 2) -> Pawn(white), Pos(F, 2) -> Pawn(white), Pos(G, 2) -> Pawn(white), Pos(H, 2) -> Pawn(white),
-      Pos(A, 7) -> Pawn(black), Pos(B, 7) -> Pawn(black), Pos(C, 7) -> Pawn(black), Pos(D, 7) -> Pawn(black),
-      Pos(E, 7) -> Pawn(black), Pos(F, 7) -> Pawn(black), Pos(G, 7) -> Pawn(black), Pos(H, 7) -> Pawn(black),
-      Pos(A, 8) -> Rook(black), Pos(B, 8) -> Knight(black), Pos(C, 8) -> Bishop(black), Pos(D, 8) -> Queen(black),
-      Pos(E, 8) -> King(black), Pos(F, 8) -> Bishop(black), Pos(G, 8) -> Knight(black), Pos(H, 8) -> Rook(black)
+      Place(A, 1) -> Rook(white), Place(B, 1) -> Knight(white), Place(C, 1) -> Bishop(white), Place(D, 1) -> Queen(white),
+      Place(E, 1) -> King(white), Place(F, 1) -> Bishop(white), Place(G, 1) -> Knight(white), Place(H, 1) -> Rook(white),
+      Place(A, 2) -> Pawn(white), Place(B, 2) -> Pawn(white), Place(C, 2) -> Pawn(white), Place(D, 2) -> Pawn(white),
+      Place(E, 2) -> Pawn(white), Place(F, 2) -> Pawn(white), Place(G, 2) -> Pawn(white), Place(H, 2) -> Pawn(white),
+      Place(A, 7) -> Pawn(black), Place(B, 7) -> Pawn(black), Place(C, 7) -> Pawn(black), Place(D, 7) -> Pawn(black),
+      Place(E, 7) -> Pawn(black), Place(F, 7) -> Pawn(black), Place(G, 7) -> Pawn(black), Place(H, 7) -> Pawn(black),
+      Place(A, 8) -> Rook(black), Place(B, 8) -> Knight(black), Place(C, 8) -> Bishop(black), Place(D, 8) -> Queen(black),
+      Place(E, 8) -> King(black), Place(F, 8) -> Bishop(black), Place(G, 8) -> Knight(black), Place(H, 8) -> Rook(black)
     )
-
-  case class Move(from: GameBoard, to: GameBoard)
 }
 
