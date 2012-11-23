@@ -167,7 +167,7 @@ object GameDef {
     }
   }
 
-  val initialState: GameBoard =
+  val boardAtStart: GameBoard =
     Map(
       Place(A, 1) -> Rook(white), Place(B, 1) -> Knight(white), Place(C, 1) -> Bishop(white), Place(D, 1) -> Queen(white),
       Place(E, 1) -> King(white), Place(F, 1) -> Bishop(white), Place(G, 1) -> Knight(white), Place(H, 1) -> Rook(white),

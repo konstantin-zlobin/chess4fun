@@ -20,21 +20,21 @@ class PieceMovementsSuite extends FunSuite {
       val baseNumber = if (color == Color.white) 1 else 8
       val forward = if (color == Color.white) (a: Int, b: Int) => a + b else (a: Int, b: Int) => a - b
       assert((
-        Rook(color).moves((A, baseNumber), initialState) ++
-          Bishop(color).moves((C, baseNumber), initialState) ++
-          Queen(color).moves((D, baseNumber), initialState) ++
-          King(color).moves((E, baseNumber), initialState) ++
-          Bishop(color).moves((F, baseNumber), initialState) ++
-          Rook(color).moves((H, baseNumber), initialState)).toSet === Set())
+        Rook(color).moves((A, baseNumber), boardAtStart) ++
+          Bishop(color).moves((C, baseNumber), boardAtStart) ++
+          Queen(color).moves((D, baseNumber), boardAtStart) ++
+          King(color).moves((E, baseNumber), boardAtStart) ++
+          Bishop(color).moves((F, baseNumber), boardAtStart) ++
+          Rook(color).moves((H, baseNumber), boardAtStart)).toSet === Set())
 
       val knightTargetNumber = forward(baseNumber, 2)
-      assert(Knight(color).moves((G, baseNumber), initialState).toSet ===
+      assert(Knight(color).moves((G, baseNumber), boardAtStart).toSet ===
         Set(Place(F, knightTargetNumber), Place(H, knightTargetNumber)))
-      assert(Knight(color).moves((B, baseNumber), initialState).toSet ===
+      assert(Knight(color).moves((B, baseNumber), boardAtStart).toSet ===
         Set(Place(A, knightTargetNumber), Place(C, knightTargetNumber)))
 
       assert((A to H).map(
-        (letter: Int) => Pawn(color).moves((letter, forward(baseNumber, 1)), initialState).toSet ===
+        (letter: Int) => Pawn(color).moves((letter, forward(baseNumber, 1)), boardAtStart).toSet ===
           Set[Place]((letter, forward(baseNumber, 2)), (letter, forward(baseNumber, 3)))).reduce((a, b) => a.map(_ + b)))
     }
     testInitialState(Color.white)
